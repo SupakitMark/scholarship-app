@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ - Scholarship Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-md border border-gray-200">
+    <div class="text-center mb-6">
+      <h1 class="text-2xl font-bold text-emerald-700">🎓 เข้าสู่ระบบ</h1>
+      <p class="text-xs text-gray-500 mt-1">Scholarship Management System</p>
+    </div>
+
+    <!-- แท็บสลับ เข้าสู่ระบบ / สมัครสมาชิก -->
+    <div class="flex border-b mb-6 text-sm font-semibold">
+      <button id="tab-login" onclick="switchTab('login')" class="w-1/2 py-2 border-b-2 border-emerald-600 text-emerald-700">เข้าสู่ระบบ</button>
+      <button id="tab-register" onclick="switchTab('register')" class="w-1/2 py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600">สมัครสมาชิก</button>
+    </div>
+
+    <!-- ฟอร์ม Login -->
+    <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">อีเมล</label>
+        <input type="email" id="login-email" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">รหัสผ่าน</label>
+        <input type="password" id="login-password" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+      <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-lg text-sm hover:bg-emerald-700 transition">
+        เข้าสู่ระบบ
+      </button>
+    </form>
+
+    <!-- ฟอร์ม Register (ซ่อนไว้เริ่มต้น) -->
+    <form id="form-register" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+        <input type="text" id="reg-fullname" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">อีเมล</label>
+        <input type="email" id="reg-email" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-700 mb-1">รหัสผ่าน</label>
+        <input type="password" id="reg-password" required minlength="6" class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">คณะ</label>
+          <input type="text" id="reg-faculty" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">สาขาวิชา</label>
+          <input type="text" id="reg-major" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">ชั้นปีที่</label>
+          <input type="number" id="reg-year" min="1" max="6" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-700 mb-1">เกรดเฉลี่ย (GPA)</label>
+          <input type="number" id="reg-gpa" step="0.01" min="0" max="4.00" required class="w-full border rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+      </div>
+      <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded-lg text-sm hover:bg-emerald-700 transition">
+        ลงทะเบียนบัญชีใหม่
+      </button>
+    </form>
+  </div>
+
+  <!-- โหลดสคริปต์เรียงตามลำดับ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function switchTab(type) {
+      const formLogin = document.getElementById('form-login');
+      const formReg = document.getElementById('form-register');
+      const tabLogin = document.getElementById('tab-login');
+      const tabReg = document.getElementById('tab-register');
+
+      if (type === 'login') {
+        formLogin.classList.remove('hidden');
+        formReg.classList.add('hidden');
+        tabLogin.className = "w-1/2 py-2 border-b-2 border-emerald-600 text-emerald-700";
+        tabReg.className = "w-1/2 py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600";
+      } else {
+        formLogin.classList.add('hidden');
+        formReg.classList.remove('hidden');
+        tabReg.className = "w-1/2 py-2 border-b-2 border-emerald-600 text-emerald-700";
+        tabLogin.className = "w-1/2 py-2 border-b-2 border-transparent text-gray-400 hover:text-gray-600";
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert('เข้าสู่ระบบไม่สำเร็จ: ' + error.message);
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const email = document.getElementById('reg-email').value;
+      const password = document.getElementById('reg-password').value;
+      const fullName = document.getElementById('reg-fullname').value;
+      const faculty = document.getElementById('reg-faculty').value;
+      const major = document.getElementById('reg-major').value;
+      const year = parseInt(document.getElementById('reg-year').value);
+      const gpa = parseFloat(document.getElementById('reg-gpa').value);
+
+      const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+      if (authError) {
+        alert('เกิดข้อผิดพลาด: ' + authError.message);
+        return;
+      }
+
+      if (authData.user) {
+        await supabase.from('users').insert([{
+          id: authData.user.id,
+          email: email,
+          role: 'student'
+        }]);
+
+        await supabase.from('student_profiles').insert([{
+          user_id: authData.user.id,
+          full_name: fullName,
+          faculty: faculty,
+          major: major,
+          study_year: year,
+          gpa: gpa
+        }]);
+
+        alert('ลงทะเบียนสำเร็จ! กรุณาเข้าสู่ระบบ');
+        switchTab('login');
+      }
+    }
+  </script>
+</body>
+</html>
